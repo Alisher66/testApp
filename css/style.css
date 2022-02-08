@@ -107,7 +107,7 @@
 }
 
 .modal .form-floating>label {
-    margin-left: 0.75rem;
+    /* margin-left: 0.75rem; */
 }
 
 .modal #edit_contact {
@@ -169,8 +169,10 @@
 .modal_delete_subject{
     height: 200px;
 }
-
-.modal_delete_btns{
+.modal_edit_subject{
+    height: 220px
+}
+.modal_delete_btns, .modal_edit_btns {
     display: flex;
     justify-content: space-evenly;
     margin-top: 20px;
@@ -222,11 +224,11 @@
 }
 
 .modal .form-floating {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .modal .form-floating>label {
-    margin-left: 0.75rem;
+    /* margin-left: 0.75rem; */
 }
 
 .modal #edit_contact {
@@ -250,4 +252,47 @@
 	background-color: #198754;
 	color: #fff;
 	transition: all 0.5s;
+}
+
+.question-wrap{
+}
+.question_td{
+    width: 60%;
+}
+.accardion-item__trigger{
+    padding: 10px;
+    border: 1px solid #212529;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.accardion-item__content{
+    padding: 10px;
+    border: 1px solid #212529;
+    border-radius: 2px;
+    border-top: none;
+    display: none;
+    transition: 0.5s ease-in-out;
+}
+.accardion-item__active .accardion-item__trigger{
+    background: rgb(216, 214, 210) 
+}
+.accardion-item__active .accardion-item__content{
+    background: rgb(216, 214, 210);
+    display: block;
+}
+tr{
+    vertical-align: middle;
+}
+
+.variantes{
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    padding:0;
+    margin: 0;
+}
+
+.variantes .isTure{
+    border: 1px dashed #198754;
+    padding: 5px;
 }

@@ -12,8 +12,7 @@ const questions = [
     {  "subject_id": 2, "question": "1+3 = ?", "variantes": { a: "0", b: "2", c: "3", d: "undefined" }, "answer": "b" },
 ];
 
-new Subject();
-new Question();
+
 
 
 initDB([
@@ -51,6 +50,15 @@ function creatTables(db, key, arr) {
         objectStore.add(arr[i]);
     }
 }
+
+const openSubject = new Subject();
+openSubject.initDom();
+openSubject.openDb();
+
+
+// const openQuestion = new Question();
+// openQuestion.initDom();
+// openQuestion.openDb();
 
 // const subjects = [
 //     { "name": "Математика", },

@@ -1,12 +1,9 @@
 
-import { Question } from "./question.js"
-
 
 export class Subject {
 
     constructor() {
-        this.initDom();
-        this.openDb();
+
     }
 
     initDom() {
@@ -36,7 +33,7 @@ export class Subject {
         if (window.location.href.includes("subject.html")) {
             this.addSubject(db);
             this.deleteSubject(db);
-
+            this.editSubject(db);
         }
 
     }
@@ -47,7 +44,8 @@ export class Subject {
             .getAll();
 
         request.onsuccess = () => {
-            this.getTable(request.result)
+            this.getTable(request.result);
+            this.updateQuestions(db);
         }
     }
 
@@ -67,6 +65,7 @@ export class Subject {
         });
 
         this.tbody.innerHTML = tempHtml.join("");
+
     }
 
     addSubject(db) {
@@ -86,9 +85,8 @@ export class Subject {
             request.onsuccess = () => {
                 this.showNotification("notification", "Предмет добавлен");
                 nameEl.value = "";
-
                 this.showTable(db);
-                new Question()
+
             }
             request.onerror = () => {
                 this.showNotification("notification", "Ошибка");
@@ -132,11 +130,11 @@ export class Subject {
         document.querySelector("main").insertAdjacentHTML("beforeend", modalHtml);
         this.overlay.classList.add("show");
 
-        this.closeModal();
+        this.closeDeleteModal();
         this.remove(db, subject.id);
     }
 
-    closeModal() {
+    closeDeleteModal() {
         const modal = document.querySelector(".modal_delete_subject")
         this.overlay.addEventListener("click", (e) => {
             this.overlay.classList.remove("show");
@@ -151,29 +149,144 @@ export class Subject {
             })
         }
         const exitBtn = document.querySelector(".modal_delete_exit");
-        exitBtn.addEventListener("click", (e) =>{
+        exitBtn.addEventListener("click", (e) => {
             this.overlay.classList.remove("show");
             modal.remove();
         })
-        
+
     }
     remove(db, id) {
         const modal = document.querySelector(".modal_delete_subject")
         const deleteBtn = document.querySelector(".modal_delete_btn");
-        deleteBtn.addEventListener("click", (e) =>{
-            let request = db.transaction("subjects","readwrite")
+        deleteBtn.addEventListener("click", (e) => {
+            let request = db.transaction("subjects", "readwrite")
                 .objectStore("subjects")
                 .delete(id);
-            
-            request.onsuccess = () =>{
+
+            request.onsuccess = () => {
                 this.overlay.classList.remove("show");
                 modal.remove();
                 this.showTable(db);
                 this.showNotification("notification", "Предмет удален");
             }
+        });
+    }
+
+    editSubject(db) {
+        this.tbody.addEventListener('click', (e) => {
+            if (!e.target.matches(".edit")) return;
+
+            let request = db.transaction("subjects")
+                .objectStore("subjects")
+                .get(+e.target.dataset.id);
+
+            request.onsuccess = () => {
+                this.openEditeModal(db, request.result);
+            }
         })
     }
 
+    openEditeModal(db, subject) {
+        const modalHtml = `
+        <div class="modal modal_edit_subject show" data-modal = "${subject.id}">
+            <svg class="modal__cross" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 96 96" enable-background="new 0 0 96 96" xml:space="preserve">
+            <polygon fill="black" points="96,14 82,0 48,34 14,0 0,14 34,48 0,82 14,96 48,62 82,96 96,82 62,48 "/>
+            </svg>
+            <div class="">
+                <h3>Изменить предет</h3>
+            </div>
+            <div class="form-floating">
+                <input type="text" class="form-control" id="modal_subjet_name" placeholder="Название предмета" value=${subject.name}>
+                <label for="modal_subjet_name">Название предмета</label>
+            </div>
+            <div class="modal_edit_btns">
+                <button type="button" class="btn btn-warning btn-sm modal_edit_exit">Отмена</button>
+                <button type="button" class="btn btn-success btn-sm modal_edit_save">Сохранить</button>
+            </div>
+        </div>`;
+
+        document.querySelector("main").insertAdjacentHTML("beforeend", modalHtml);
+        this.overlay.classList.add("show");
+
+        this.closeEditModal();
+        this.saveChanges(db, subject)
+
+    }
+
+    closeEditModal() {
+        const modal = document.querySelector(".modal_edit_subject")
+        this.overlay.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+
+        const modalCross = document.querySelector(".modal__cross");
+        if (modalCross) {
+            modalCross.addEventListener("click", (e) => {
+                this.overlay.classList.remove("show");
+                modal.remove();
+            })
+        }
+        const exitBtn = document.querySelector(".modal_edit_exit");
+        exitBtn.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+    }
+    saveChanges(db, subject) {
+        const modal = document.querySelector(".modal_edit_subject")
+        const saveBtn = document.querySelector(".modal_edit_save");
+        const nameEl = modal.querySelector("#modal_subjet_name");
+
+        saveBtn.addEventListener("click", (e) => {
+            let name = nameEl.value.trim();
+
+            if (name == subject.name) {
+                this.showNotification("notification", "Изменение сохранено")
+                this.overlay.classList.remove("show");
+                modal.remove();
+                return;
+            }
+            let item = {
+                id: subject.id,
+                name,
+            }
+
+            let request = db.transaction("subjects", "readwrite")
+                .objectStore("subjects")
+                .put(item);
+
+            request.onsuccess = () => {
+                this.overlay.classList.remove("show");
+                modal.remove();
+                this.showTable(db);
+                this.showNotification("notification", "Изменение сохранено");
+            }
+        });
+    }
+
+    updateQuestions(db) {
+        let request = db.transaction("questions")
+            .objectStore("questions")
+            .getAll();
+
+        request.onsuccess = () => {
+            
+            let questions = request.result;
+
+            let subjectTd = this.tbody.querySelectorAll("[data-subject]");
+            let questionTd = this.tbody.querySelectorAll("[data-question]");
+    
+            questionTd.forEach((td, index) => {
+                let id = subjectTd[index].dataset.subject;
+                let count = questions.filter(question => question.subject_id == id).length;
+                td.innerHTML = count;
+            })
+        }
+    }
+    
     showNotification(className, text) {
         const message = document.createElement("p");
         message.classList.add(className);
@@ -190,6 +303,9 @@ export class Subject {
             }, 500);
 
         }, 2000);
-
     }
 }
+
+const subject1 = new Subject();
+subject1.initDom();
+subject1.openDb();
