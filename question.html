@@ -65,27 +65,108 @@
          <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
 
-            <section class="questions">
+            <section class="questions-creat">
+               <div class="pt-3 pb-2 mb-3 border-bottom">
+                  <h1 class="h2">Форма добавления</h1>
+               </div>
+
+               <div class="questions-form row">
+
+                  <div class="col-md-6">
+                     <div class="form-floating">
+                        <textarea type="text" class="form-control" id="question_text" placeholder="Вопросс"
+                           style="height: 100px"></textarea>
+                        <label for="question_text" class="">Вопросс</label>
+                     </div>
+                     <div class="col-md-6 mt-20">
+                        <select class="form-select" name="select"  id="subject_select" aria-label="Floating label select example" aria-placeholder="Выберите предмет">
+                           
+                           <option value="1">Математика</option>
+                           <option value="2">Физика</option>
+                           <option value="3">География</option>
+                        </select>
+
+                     </div>
+                  </div>
+                  <div class="col-md-6">
+                     <div class="form-check">
+                        <input class="form-check-input variantInput" data-id="a" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант A:" id="variantA">
+                     </div>
+                     <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="b" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант B:" id="variantB">
+                     </div>
+                     <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="c" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант C:" id="variantC">
+                     </div>
+                     <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="d" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант D:" id="variantD">
+                     </div>
+                     <!-- <div class="row">
+                        <div class="col-md-12">
+                           <div class="row">
+                              <div class="col-md-11">
+                                 <input type="text" class="form-control" id="variantA" placeholder="Вариант A:">
+                                 <label for="variantA" class="ml-10">Вариант А:</label>
+                              </div>
+                              <div class="col-md-1">
+                                 <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1"
+                                    value="option1">
+                              </div>
+
+                              <div class="form-floating col-md-3 mt-20">
+                                 <input type="text" class="form-control" id="variantB" placeholder="Вариант B:">
+                                 <label for="variantB" class="ml-10">Вариант B:</label>
+                              </div>
+                              <div class="form-floating col-md-3 mt-20">
+                                 <input type="text" class="form-control" id="variantC" placeholder="Вариант C:">
+                                 <label for="variantC" class="ml-10">Вариант C:</label>
+                              </div>
+                              <div class="form-floating col-md-3 mt-20">
+                                 <input type="text" class="form-control" id="variantD" placeholder="Вариант D:">
+                                 <label for="variantD" class="ml-10">Вариант D:</label>
+                              </div>
+                           </div>
+                        </div>
+                     </div> -->
+                  </div>
+
+
+
+
+                  <div class="col-md-12 mt-40 center">
+                     <button type="button" class="btn btn-outline-primary btn-lg" id="question_add">Добавить
+                        вопрос</button>
+                  </div>
+
+
+               </div>
+
+
+            </section>
+
+            <section class="questions-info">
                <div class="pt-3 pb-2 mb-3 border-bottom">
                   <h1 class="h2">База вопросов</h1>
                </div>
-               <div class="row">
+               <div class="row align-items-md-stretch mt-20">
                   <div class="col-md-12">
-                     <div class="row align-items-md-stretch">
-                        <div class="col-md-12">
-                           <div class="h-100 p-4 bg-light border rounded-3">
+                     <div class="h-100 p-4 bg-light border rounded-3">
 
-                              <div class="subject-table">
-                                 <table class="table">
-                                    <thead>
-                                       <tr>
-                                          <th scope="col">#</th>
-                                          <th scope="col">Вопросы</th>
-                                          <th scope="col">Предметы</th>
-                                       </tr>
-                                    </thead>
-                                    <tbody>
-                                       <tr>
+                        <div class="subject-table">
+                           <table class="table">
+                              <thead>
+                                 <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Вопросы</th>
+                                    <th scope="col">Предметы</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <!-- <tr>
                                           <td scope="row">1</td>
                                           <td class="question_td">
                                              <div class="question-wrap accardion-item">
@@ -104,79 +185,11 @@
                                           <td class="delete_td"><button type="button"
                                                 class="btn btn-outline-danger btn-sm delete">Удалить</button></td>
                                           </td>
-                                       </tr>
-                                       <tr>
-                                          <td scope="row">2</td>
-                                          <td class="question_td">
-                                             <div class="question-wrap accardion-item">
-                                                <div class="accardion-item__trigger">
-                                                   Lorem ipsum sed2?
-                                                </div>
-                                                <div class="accardion-item__content">
-                                                   <ul class="variantes">
-                                                      <li>a: asdasd</li>
-                                                      <li><span class="isTure">b: asdasd</span> </li>
-                                                      <li>c: asdasd</li>
-                                                      <li>d: asdasd</li>
-                                                      
-                                                   </ul>
-                                                </div>
-                                             </div>
-                                          </td>
-                                          <td>математика</td>
-                                          <td>
-                                          <td class="edit_td"><button type="button"
-                                                class="btn btn-outline-info btn-sm edit">Изменить</button></td>
-                                          <td class="delete_td"><button type="button"
-                                                class="btn btn-outline-danger btn-sm delete">Удалить</button></td>
-                                          </td>
-                                       </tr>
-                                       <tr>
-                                          <td scope="row">3</td>
-                                          <td class="question_td">
-                                             <div class="question-wrap accardion-item">
-                                                <div class="accardion-item__trigger">
-                                                   Lorem ipsum sed?
-                                                </div>
-                                                <div class="accardion-item__content">
-                                                   conter3
-                                                </div>
-                                             </div>
-                                          </td>
-                                          <td>математика</td>
-                                          <td>
-                                          <td class="edit_td"><button type="button"
-                                                class="btn btn-outline-info btn-sm edit">Изменить</button></td>
-                                          <td class="delete_td"><button type="button"
-                                                class="btn btn-outline-danger btn-sm delete">Удалить</button></td>
-                                          </td>
-                                       </tr>
-                                       <tr>
-                                          <td scope="row">4</td>
-                                          <td class="question_td">
-                                             <div class="question-wrap accardion-item">
-                                                <div class="accardion-item__trigger">
-                                                   Lorem ipsum sed?
-                                                </div>
-                                                <div class="accardion-item__content">
-                                                   conter1
-                                                </div>
-                                             </div>
-                                          </td>
-                                          <td>математика</td>
-                                          <td>
-                                          <td class="edit_td"><button type="button"
-                                                class="btn btn-outline-info btn-sm edit">Изменить</button></td>
-                                          <td class="delete_td"><button type="button"
-                                                class="btn btn-outline-danger btn-sm delete">Удалить</button></td>
-                                          </td>
-                                       </tr>
-                                    </tbody>
-                                 </table>
-                              </div>
-                           </div>
-                        </div>
+                                       </tr> -->
 
+                              </tbody>
+                           </table>
+                        </div>
                      </div>
                   </div>
 

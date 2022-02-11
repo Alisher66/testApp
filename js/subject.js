@@ -17,6 +17,9 @@ export class Subject {
         let openRequest = indexedDB.open("Quiz", 1);
         let db;
 
+        openRequest.onupgradeneeded = () =>{
+            db = openRequest.result;
+        }
         openRequest.onerror = () => {
             console.error("Error");
         };

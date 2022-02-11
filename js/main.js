@@ -56,9 +56,9 @@ openSubject.initDom();
 openSubject.openDb();
 
 
-// const openQuestion = new Question();
-// openQuestion.initDom();
-// openQuestion.openDb();
+const openQuestion = new Question();
+openQuestion.initDom();
+openQuestion.openDb();
 
 // const subjects = [
 //     { "name": "Математика", },

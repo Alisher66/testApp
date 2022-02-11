@@ -296,3 +296,29 @@ tr{
     border: 1px dashed #198754;
     padding: 5px;
 }
+
+.ml-10{
+    margin-left: 10px;
+}
+.mt-20{
+    margin-top: 20px;
+}
+.mt-40{
+    margin-top: 40px;
+}
+
+.message {
+    color: #dc3545;
+    font-size: 20px;
+}
+
+.questions-info{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.form-check{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
