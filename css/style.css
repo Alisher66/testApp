@@ -169,8 +169,15 @@
 .modal_delete_subject{
     height: 200px;
 }
+.modal_delete_question {
+    height: 250px;
+}
 .modal_edit_subject{
     height: 220px
+}
+.modal_edit_question{
+    height: 500px;
+    width: 600px;
 }
 .modal_delete_btns, .modal_edit_btns {
     display: flex;
@@ -309,7 +316,8 @@ tr{
 
 .message {
     color: #dc3545;
-    font-size: 20px;
+    font-size: 18px;
+    margin: 0;
 }
 
 .questions-info{
@@ -322,3 +330,4 @@ tr{
     align-items: center;
     justify-content: space-between;
 }
+

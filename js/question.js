@@ -31,8 +31,8 @@ export class Question {
         if (window.location.href.includes("question.html")) {
             this.showAllQuestions(db);
             this.addQusetion(db);
-            // this.deleteQusetion(db);
-            // this.editQusetion(db);
+            this.deleteQusetion(db);
+            this.editQusetion(db);
         }
     }
 
@@ -52,7 +52,7 @@ export class Question {
         this.tbody.innerHTML = "";
         const tempHtml = questions.map((question, index) => {
             return `
-            <tr>
+            <tr data-question=${question.id}>
                 <td scope="row">${++index}</td>
                 <td class="question_td">
                 <div class="question-wrap accardion-item">
@@ -65,7 +65,7 @@ export class Question {
                 </div>
                 </td>
                 <td data-subject="${question.subject_id}"></td>
-                <td>
+                
                 <td class="edit_td"><button type="button"
                     class="btn btn-outline-info btn-sm edit">Изменить</button></td>
                 <td class="delete_td"><button type="button"
@@ -88,9 +88,9 @@ export class Question {
     }
 
     getSubjectNames(db) {
-       
+
         const tdEls = document.querySelectorAll("td[data-subject]");
-    
+
         let request = db.transaction("subjects")
             .objectStore("subjects")
             .getAll();
@@ -98,26 +98,26 @@ export class Question {
         return request.onsuccess = () => {
             tdEls.forEach(td => {
                 let index = td.dataset.subject;
-             
+
                 let subject = request.result.find(question => question.id == index);
-                
-                if(subject) td.textContent = subject.name;
+
+                if (subject) td.textContent = subject.name;
                 else td.textContent = "Предмет не определен";
             });
         }
-        
+
     }
     addQusetion(db) {
-        const formWrap = document.querySelector(".questions-form");
+        this.formWrap = document.querySelector(".questions-form");
 
-        const questionText = formWrap.querySelector("#question_text");
-        const subjectSelect = formWrap.querySelector("#subject_select");
-        const variantAText = formWrap.querySelector("#variantA");
-        const variantBText = formWrap.querySelector("#variantB");
-        const variantCText = formWrap.querySelector("#variantC");
-        const variantDText = formWrap.querySelector("#variantD");
-        const variants = formWrap.querySelectorAll(".variantInput");
-        const addBtn = formWrap.querySelector("#question_add");
+        const questionText = this.formWrap.querySelector("#question_text");
+        const subjectSelect = this.formWrap.querySelector("#subject_select");
+        const variantAText = this.formWrap.querySelector("#variantA");
+        const variantBText = this.formWrap.querySelector("#variantB");
+        const variantCText = this.formWrap.querySelector("#variantC");
+        const variantDText = this.formWrap.querySelector("#variantD");
+        const variants = this.formWrap.querySelectorAll(".variantInput");
+        const addBtn = this.formWrap.querySelector("#question_add");
 
         this.getSubjectsOptions(db, subjectSelect);
 
@@ -136,7 +136,7 @@ export class Question {
             }
 
             if (text == "" || select == "" || variantA == "" || variantB == "" || variantC == "" || variantD == "" || !trueId || select == 0) {
-                this.showMessage(formWrap, "message", "Заполните все поля");
+                this.showMessage(this.formWrap, "message", "Заполните все поля");
                 return;
             }
 
@@ -157,27 +157,257 @@ export class Question {
                 }
                 this.clearInputs(questionText, subjectSelect, variantAText, variantBText, variantCText, variantDText);
                 this.showAllQuestions(db);
-                this.showNotification(formWrap, "notification", "Вопрос добавлен");
+                this.showNotification(this.formWrap, "notification", "Вопрос добавлен");
             }
 
         });
 
     }
-    getSubjectsOptions(db, el) {
+    getSubjectsOptions(db, el, id = 0) {
         let request = db.transaction("subjects")
             .objectStore("subjects")
             .getAll();
 
         request.onsuccess = () => {
-            let tempHtml = ["<option selected value='0'>Выберите предмет</option>"];
+            let tempHtml = [`<option ${id == 0 ? "selected" : ""} value='0'>Выберите предмет</option>`];
             request.result.forEach(subject => {
-                tempHtml.push(`<option value="${subject.id}">${subject.name}</option>`);
+                tempHtml.push(`<option ${id == +subject.id ? "selected" : ""} value="${subject.id}">${subject.name}</option>`);
             });
             el.innerHTML = tempHtml.join("");
         }
 
     }
 
+    deleteQusetion(db) {
+        this.tbody.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("delete")) return
+            let id = e.target.parentElement.parentElement.dataset.question;
+
+            let request = db.transaction("questions")
+                .objectStore("questions")
+                .get(+id);
+
+            request.onsuccess = () => {
+                this.openDeleteModal(db, request.result);
+            }
+        })
+    }
+
+    openDeleteModal(db, question) {
+        const modalHtml = `
+        <div class="modal modal_delete_question show" data-modal = "${question.id}">
+            <svg class="modal__cross" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 96 96" enable-background="new 0 0 96 96" xml:space="preserve">
+            <polygon fill="black" points="96,14 82,0 48,34 14,0 0,14 34,48 0,82 14,96 48,62 82,96 96,82 62,48 "/>
+            </svg>
+            <div class="modal_delete_message">
+                <p>Вы действительно хотите удалить вопрос <br>"${question.question}" ?</p>
+            </div>
+            <div class="modal_delete_btns">
+                <button type="button" class="btn btn-warning btn-sm modal_delete_exit">Отмена</button>
+                <button type="button" class="btn btn-danger btn-sm modal_delete_btn">Удалить</button>
+            </div>
+        </div>`;
+
+        document.querySelector("main").insertAdjacentHTML("beforeend", modalHtml);
+        this.overlay.classList.add("show");
+
+        // this.closeDeleteModal();
+        this.closeModal("modal_delete_question", "modal_delete_exit");
+        this.remove(db, question.id);
+    }
+    closeDeleteModal() {
+        const modal = document.querySelector(".modal_delete_question")
+        this.overlay.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+
+        const modalCross = document.querySelector(".modal__cross");
+        if (modalCross) {
+            modalCross.addEventListener("click", (e) => {
+                this.overlay.classList.remove("show");
+                modal.remove();
+            })
+        }
+        const exitBtn = document.querySelector(".modal_delete_exit");
+        exitBtn.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+    }
+    remove(db, id) {
+        const modal = document.querySelector(".modal_delete_question")
+        const deleteBtn = document.querySelector(".modal_delete_btn");
+        deleteBtn.addEventListener("click", (e) => {
+            let request = db.transaction("questions", "readwrite")
+                .objectStore("questions")
+                .delete(id);
+
+            request.onsuccess = () => {
+                this.overlay.classList.remove("show");
+                modal.remove();
+                this.showAllQuestions(db);
+                this.showNotification(this.formWrap, "notification", "Вопрос удален");
+            }
+        });
+    }
+
+    editQusetion(db) {
+        this.tbody.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("edit")) return
+            let id = e.target.parentElement.parentElement.dataset.question;
+
+            let request = db.transaction("questions")
+                .objectStore("questions")
+                .get(+id);
+
+            request.onsuccess = () => {
+                this.openEditModal(db, request.result);
+            }
+        })
+
+    }
+    openEditModal(db, question) {
+        const modalHtml = `
+        <div class="modal modal_edit_question show" data-modal = "${question.id}">
+            <svg class="modal__cross" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 96 96" enable-background="new 0 0 96 96" xml:space="preserve">
+            <polygon fill="black" points="96,14 82,0 48,34 14,0 0,14 34,48 0,82 14,96 48,62 82,96 96,82 62,48 "/>
+            </svg>
+            <div class="">
+                <h3>Изменить предет</h3>
+            </div>
+            <div class="form-floating">
+                <textarea type="text" class="form-control" style="height: 100px" id="modal_question_name" placeholder="Вопрос" >${question.question}</textarea>
+                <label for="modal_question_name">Вопрос</label>
+            </div>
+            <div class = "row"> 
+                <div class="col-md-6">
+                    <div class="form-check mt-20">
+                    <input class="form-check-input variantInput" data-id="a" type="radio" name="variants" id="" >
+                    <input type="text" class="form-control" placeholder="Вариант A:" id="variantA" value="${question.variantes.a}">
+                    </div>
+                    <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="b" type="radio" name="variants" id="" >
+                        <input type="text" class="form-control" placeholder="Вариант B:" id="variantB" value="${question.variantes.b}">
+                    </div>
+                    <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="c" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант C:" id="variantC" value="${question.variantes.c}">
+                    </div>
+                    <div class="form-check mt-20">
+                        <input class="form-check-input variantInput" data-id="d" type="radio" name="variants" id="">
+                        <input type="text" class="form-control" placeholder="Вариант D:" id="variantD" value="${question.variantes.d}">
+                    </div>
+                </div>
+                <div class="col-md-6 mt-20">
+                    <select class="form-select" name="select"  id="subject_select_modal" aria-label="Floating label select example" aria-placeholder="Выберите предмет"> 
+                    </select>
+                </div>
+            </div>
+            <div class="modal_edit_btns">
+                <button type="button" class="btn btn-warning btn-sm modal_edit_exit">Отмена</button>
+                <button type="button" class="btn btn-success btn-sm modal_edit_save">Сохранить</button>
+            </div>
+        </div>`;
+
+        document.querySelector("main").insertAdjacentHTML("beforeend", modalHtml);
+        this.overlay.classList.add("show");
+
+        document.querySelectorAll(".modal .variantInput").forEach(el => {
+            if (el.dataset.id == question.answer) el.checked = true;
+        })
+        let select = document.querySelector(".modal #subject_select_modal");
+        this.getSubjectsOptions(db, select, question.subject_id);
+
+        this.closeModal("modal_edit_question", "modal_edit_exit");
+        this.saveChanges(db, question);
+    }
+
+    closeModal(modalClassName, exitBtnClassName) {
+        const modal = document.querySelector("." + modalClassName)
+        this.overlay.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+
+        const modalCross = document.querySelector(".modal__cross");
+        if (modalCross) {
+            modalCross.addEventListener("click", (e) => {
+                this.overlay.classList.remove("show");
+                modal.remove();
+            })
+        }
+        const exitBtn = document.querySelector("." + exitBtnClassName);
+        exitBtn.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            modal.remove();
+        })
+    }
+
+    saveChanges(db, question) {
+        const formWrap = document.querySelector(".modal_edit_question");
+
+        let textEl = formWrap.querySelector("#modal_question_name")
+        let selectEl = formWrap.querySelector("#subject_select_modal");
+        let variantAEl = formWrap.querySelector("#variantA")
+        let variantBEl = formWrap.querySelector("#variantB")
+        let variantCEl = formWrap.querySelector("#variantC")
+        let variantDEl = formWrap.querySelector("#variantD")
+
+        const checkboxes = formWrap.querySelectorAll(".variantInput");
+        const saveBtn = formWrap.querySelector(".modal_edit_save");
+        const exitBtn = formWrap.querySelector(".modal_edit_exit")
+
+        exitBtn.addEventListener("click", (e) => {
+            this.overlay.classList.remove("show");
+            formWrap.remove();
+        })
+
+        saveBtn.addEventListener("click", (e) => {
+            let trueId;
+            let select = selectEl.value;
+            let text = textEl.value.trim();
+            let variantA = variantAEl.value.trim()
+            let variantB = variantBEl.value.trim()
+            let variantC = variantCEl.value.trim()
+            let variantD = variantDEl.value.trim()
+
+            for (let el of checkboxes) {
+                if (el.checked) trueId = el.dataset.id;
+            }
+
+            if (text == "" || variantA == "" || variantB == "" || variantC == "" || variantD == "" || !trueId || select == 0 || select == "") {
+                this.showMessage(formWrap, "message", "Заполните все поля");
+                return;
+            }
+
+            const newQuestion = {
+                id: question.id,
+                answer: trueId,
+                question: text,
+                subject_id: select,
+                variantes: { a: variantA, b: variantB, c: variantC, d: variantD },
+            };
+            let request = db.transaction("questions", "readwrite")
+                .objectStore("questions")
+                .put(newQuestion);
+
+            request.onsuccess = () => {
+                formWrap.remove();
+                this.overlay.classList.remove("show");
+
+                this.showAllQuestions(db);
+                this.showNotification(this.formWrap, "notification", "Вопрос изменен");
+            }
+            request.onerror = () =>{
+                console.log("error");
+            }
+        })
+    }
     clearInputs(...args) {
         args.forEach(el => {
             if (el.type == "radio" || el.type == "checkbox") {
@@ -199,7 +429,7 @@ export class Question {
         const message = document.createElement("p");
         message.classList.add(className);
         message.textContent = text;
-        element.insertAdjacentElement("beforeBegin", message);
+        element.insertAdjacentElement("afterBegin", message);
         setTimeout(() => {
             message.remove();
         }, 2000);
